@@ -1,5 +1,5 @@
 {
   "appId": "com.nabikendo.standbye",
   "appName": "StandBye",
-  "webDir": "."
+  "webDir": "www"
 }
