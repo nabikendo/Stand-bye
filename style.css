@@ -1,224 +1,116 @@
-/* =========================================================
-   VARIÁVEIS DE TEMA E PROTEÇÃO AMOLED (#000000 ABSOLUTO)
-   ========================================================= */
-:root {
-  --bg-amoled: #000000;
-  --fg-primary: #ffffff;
-  --fg-secondary: #737373;
-  --accent-color: #38bdf8;
-  --ring-track: #141414;
-  --container-alpha: 0.88;
-}
-
-/* Filtro de Modo Noturno Vermelho (customNightModeTintConfig) */
-body.night-mode {
-  --fg-primary: #ff1a1a;
-  --fg-secondary: #660505;
-  --accent-color: #cc0000;
-  --ring-track: #1a0202;
-  --container-alpha: 0.55; /* Reduz emissão luminosa no escuro */
-}
-
-/* =========================================================
-   RESET E BASE FULLSCREEN
-   ========================================================= */
+/* Reset e Base AMOLED (Preto Puro #000000 para desligar os pixels) */
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-html, body {
-  width: 100vw;
-  height: 100vh;
-  background-color: var(--bg-amoled);
-  color: var(--fg-primary);
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.35s ease;
+body, html {
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+    color: #ffffff;
+    font-family: system-ui, -apple-system, sans-serif;
+    overflow: hidden;
 }
 
-/* =========================================================
-   LAYOUT AMOLED_CLOCK_DUO (DIVISÃO 50 / 50 HORIZONTAL)
-   ========================================================= */
-#standby-container.duo-layout {
-  width: 92vw;
-  height: 86vh;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  justify-items: center;
-  opacity: var(--container-alpha);
-  /* Transição suave para que o Pixel Shift (Drift) seja imperceptível */
-  transition: transform 1.8s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
-  will-change: transform;
+#standby-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+    transition: transform 0.3s ease, filter 0.3s ease;
 }
 
-.duo-pane {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+/* Divisão exata 50/50 do AMOLED_CLOCK_DUO */
+.duo-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    max-width: 1100px;
+    gap: 48px;
 }
 
-/* =========================================================
-   PAINEL ESQUERDO: RELÓGIO DIGITAL MINIMALISTA
-   ========================================================= */
-.digital-clock {
-  font-size: clamp(4.5rem, 15vw, 9.5rem);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.03em;
-  font-variant-numeric: tabular-nums;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.widget {
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
 }
 
-/* Separador piscante (AMOLED_CLOCK_TOGGLE_BLINKING_SEPARATOR) */
-.colon-blink {
-  margin: 0 0.04em;
-  transform: translateY(-0.06em);
-  animation: pulse-colon 2s step-start infinite;
+/* Relógio Minimalista */
+#digital-clock {
+    font-size: 7.5rem;
+    font-weight: 700;
+    letter-spacing: -3px;
+    line-height: 1;
 }
 
-@keyframes pulse-colon {
-  50% { opacity: 0.12; }
-}
-
-.date-display {
-  margin-top: 0.8rem;
-  font-size: clamp(0.95rem, 2.2vw, 1.35rem);
-  font-weight: 500;
-  color: var(--fg-secondary);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  transition: color 0.35s ease;
-}
-
-/* =========================================================
-   PAINEL DIREITO: WIDGET DE BATERIA
-   ========================================================= */
-.battery-widget {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.battery-ring-wrapper {
-  position: relative;
-  width: clamp(140px, 24vw, 220px);
-  height: clamp(140px, 24vw, 220px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.battery-ring {
-  width: 100%;
-  height: 100%;
-  transform: rotate(-90deg);
-}
-
-.ring-track {
-  fill: none;
-  stroke: var(--ring-track);
-  stroke-width: 8;
-  transition: stroke 0.35s ease;
-}
-
-.ring-fill {
-  fill: none;
-  stroke: var(--accent-color);
-  stroke-width: 8;
-  stroke-linecap: round;
-  /* Circunferência para r=52: 2 * PI * 52 ≈ 326.72 */
-  stroke-dasharray: 326.72;
-  stroke-dashoffset: 0;
-  transition: stroke-dashoffset 0.8s ease, stroke 0.35s ease;
-}
-
-.battery-center {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+#current-date {
+    font-size: 1.25rem;
+    color: #888888;
+    margin-top: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
 #battery-badge {
-  font-size: clamp(1.6rem, 4.2vw, 2.6rem);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
+    font-size: 3rem;
+    font-weight: 600;
 }
 
-.battery-subtext {
-  margin-top: 0.8rem;
-  font-size: clamp(0.8rem, 1.8vw, 1.1rem);
-  color: var(--fg-secondary);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  transition: color 0.35s ease;
+/* 🔴 FILTRO DO MODO NOTURNO VERMELHO */
+body.night-mode #standby-container {
+    color: #ff0000;
+}
+body.night-mode #current-date {
+    color: #550000;
 }
 
-/* =========================================================
-   OVERLAY DE ORIENTAÇÃO RETRATO (#portrait-warning)
-   ========================================================= */
+/* Tela de aviso em pé (Portrait Guard) */
 #portrait-warning {
-  position: fixed;
-  inset: 0;
-  background-color: #000000;
-  color: var(--fg-secondary);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  z-index: 9999;
-  padding: 2rem;
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000000;
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
 }
 
 #portrait-warning.active {
-  display: flex;
+    display: flex;
 }
 
 .warning-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
+    padding: 24px;
+    font-size: 1.5rem;
+    color: #ffffff;
+    font-weight: 500;
 }
 
-.rotate-icon {
-  margin-bottom: 0.5rem;
-  animation: tilt-phone 2.5s ease-in-out infinite;
-}
-
-@keyframes tilt-phone {
-  0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(-90deg); }
-}
-
-.warning-box p {
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--fg-primary);
-  opacity: 0.7;
-}
-
-.warning-box span {
-  font-size: 0.8rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+/* =========================================================
+   MÁSCARA CHECKERBOARD ANTI-BURN-IN (AMOLED SHIELD)
+   ========================================================= */
+#checkerboard-overlay {
+    position: fixed;
+    inset: -10px; /* Margem extra para evitar vazar bordas no shift */
+    z-index: 999;
+    pointer-events: none; /* Permite clicar/tocar através da máscara */
+    opacity: 0.95; /* Mantém a legibilidade perfeita do relógio */
+    
+    /* Grade de xadrez de 2px por 2px (1px preto, 1px transparente) */
+    background-image: 
+      repeating-linear-gradient(0deg, #000000, #000000 1px, transparent 1px, transparent 2px),
+      repeating-linear-gradient(90deg, #000000, #000000 1px, transparent 1px, transparent 2px);
+    background-size: 2px 2px;
+    
+    transition: background-position 0.5s ease;
 }
