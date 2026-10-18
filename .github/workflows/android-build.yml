@@ -1,0 +1,51 @@
+name: Build Android APK (Capacitor)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Source Code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js (Version 24)
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+
+    - name: Setup Java JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+
+    - name: Install Dependencies
+      run: |
+        npm init -y
+        npm install @capacitor/core @capacitor/cli @capacitor/android
+
+    - name: Initialize Capacitor Config
+      run: npx cap init StandBye com.nabikendo.standbye --web-dir=. --confirm
+
+    - name: Add Android Platform
+      run: npx cap add android
+
+    - name: Sync Web Code into Android
+      run: npx cap sync android
+
+    - name: Build Android App (APK)
+      run: |
+        cd android
+        ./gradlew assembleDebug
+
+    - name: Upload APK to GitHub Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: StandBye-Debug-APK
+        path: android/app/build/outputs/apk/debug/app-debug.apk
