@@ -14,31 +14,32 @@ jobs:
     - name: Checkout Source Code
       uses: actions/checkout@v4
 
-    - name: Setup Node.js
+    - name: Setup Node.js (Version 24)
       uses: actions/setup-node@v4
       with:
-        node-version: '20'
+        node-version: 24
 
-    - name: Setup Java JDK
-      uses: actions/setup-java@v4
+    - name: Setup Java JDK (Version 17)
+      uses: actions/setup-java@v5
       with:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Install Dependencies
+    - name: Create Package Manifest
       run: |
-        npm init -y
-        npm install @capacitor/core @capacitor/cli @capacitor/android
+        echo '{"name": "standbye", "version": "1.0.0", "dependencies": {}}' > package.json
 
-    - name: Configure Capacitor App
+    - name: Install Capacitor Packages
       run: |
-        npx cap init StandBye com.nabikendo.standbye --web-dir=. --confirm
-        npx cap add android
+        npm install @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest
 
-    - name: Sync Web Assets
+    - name: Add Android Native Platform
+      run: npx cap add android
+
+    - name: Sync Web Code into Android
       run: npx cap sync android
 
-    - name: Build Debug APK
+    - name: Build Android App (APK)
       run: |
         cd android
         ./gradlew assembleDebug
