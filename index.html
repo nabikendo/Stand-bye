@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Open StandBy Display</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Container principal que simula o display de cabeceira -->
+    <main id="standby-container" class="day-mode">
+        
+        <!-- Duo Layout: Dois widgets lado a lado -->
+        <div class="duo-layout">
+            <!-- Lado Esquerdo: Relógio Digital -->
+            <section class="widget clock-widget">
+                <div id="digital-clock">00:00</div>
+                <div id="current-date">Domingo, 18 de Outubro</div>
+            </section>
+
+            <!-- Lado Direito: Calendário ou Bateria -->
+            <section class="widget info-widget">
+                <div id="battery-status">Carregando: --%</div>
+            </section>
+        </div>
+
+    </main>
+    <script href="app.js"></script>
+</body>
+</html>
