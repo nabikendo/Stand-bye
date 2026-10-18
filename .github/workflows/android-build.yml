@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    # Força o uso do Ubuntu 22.04 para evitar falhas com a transição do Ubuntu 26
+    # Força o uso do Ubuntu 22.04 para estabilidade
     runs-on: ubuntu-22.04
 
     steps:
@@ -44,6 +44,7 @@ jobs:
     - name: Build Android App (APK)
       run: |
         cd android
+        chmod +x gradlew
         ./gradlew assembleDebug
 
     - name: Upload Finished APK
