@@ -61,3 +61,39 @@ document.addEventListener('visibilitychange', () => {
         requestWakeLock();
     }
 });
+// ==========================================
+// PWA: REGISTRO DO SERVICE WORKER
+// ==========================================
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+      const registration = await navigator.serviceWorker.register('./sw.js', {
+        scope: './'
+      });
+      console.log('[Stand-bye PWA] Service Worker registrado com sucesso no escopo:', registration.scope);
+    } catch (error) {
+      console.error('[Stand-bye PWA] Falha ao registrar o Service Worker:', error);
+    }
+  });
+}
+
+// ==========================================
+// AUXILIAR DE TELA CHEIA E ROTAÇÃO (S24 FE)
+// ==========================================
+async function lockLandscapeFullscreen() {
+  try {
+    // Caso o usuário abra pelo navegador comum antes de instalar o PWA
+    if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+      await document.documentElement.requestFullscreen();
+    }
+    // Força a orientação landscape via API (suportado no Chrome/Android em fullscreen)
+    if (screen.orientation && screen.orientation.lock) {
+      await screen.orientation.lock('landscape');
+    }
+  } catch (err) {
+    console.warn('[Stand-bye] Orientação já controlada pelo Manifesto PWA ou exige gesto do usuário:', err.message);
+  }
+}
+
+// Dispara ao tocar na tela (exigência de segurança dos navegadores mobile)
+document.addEventListener('click', lockLandscapeFullscreen, { once: true });
