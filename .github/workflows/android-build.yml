@@ -34,8 +34,7 @@ jobs:
         npm install @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest
 
     - name: Add Android Native Platform
-      run: |
-        npx cap add android --confirm || true
+      run: npx cap add android
 
     - name: Sync Web Code into Android
       run: npx cap sync android
