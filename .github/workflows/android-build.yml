@@ -25,9 +25,10 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Create Package Manifest
+    - name: Organize Web Assets into www folder
       run: |
-        echo '{"name": "standbye", "version": "1.0.0", "dependencies": {}}' > package.json
+        mkdir -p www
+        cp index.html style.css app.js manifest.json sw.js www/ 2>/dev/null || cp index.html style.css app.js manifest.json www/
 
     - name: Install Capacitor Packages
       run: |
