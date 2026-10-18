@@ -1,0 +1,27 @@
+{
+  "name": "Stand-bye Mode Pro",
+  "short_name": "Stand-bye",
+  "description": "Relógio de cabeceira inteligente com proteção AMOLED Anti-Burn-In.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "landscape",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "categories": ["utilities", "lifestyle", "productivity"],
+  "icons": [
+    {
+      "src": "./assets/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
