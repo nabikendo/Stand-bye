@@ -1,30 +1,63 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Open StandBy Display</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <title>Stand-bye | AMOLED Clock Duo</title>
+  
+  <link rel="manifest" href="./manifest.json">
+  <link rel="stylesheet" href="./style.css">
 </head>
-<body>
-    <!-- Container principal que simula o display de cabeceira -->
-    <main id="standby-container" class="day-mode">
-        
-        <!-- Duo Layout: Dois widgets lado a lado -->
-        <div class="duo-layout">
-            <!-- Lado Esquerdo: Relógio Digital -->
-            <section class="widget clock-widget">
-                <div id="digital-clock">00:00</div>
-                <div id="current-date">Domingo, 18 de Outubro</div>
-            </section>
+<body class="night-mode">
 
-            <!-- Lado Direito: Calendário ou Bateria -->
-            <section class="widget info-widget">
-                <div id="battery-status">Carregando: --%</div>
-            </section>
+  <!-- Overlay de Proteção / Pausa quando o celular estiver em pé (Portrait) -->
+  <div id="portrait-warning" aria-live="polite">
+    <div class="warning-box">
+      <svg class="rotate-icon" viewBox="0 0 24 24" width="44" height="44" stroke="currentColor" stroke-width="1.5" fill="none">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+      </svg>
+      <p>Gire o S24 FE para a horizontal</p>
+      <span>Modo Stand-bye em espera</span>
+    </div>
+  </div>
+
+  <!-- Container Principal (Alvo do Algoritmo de Pixel Shift / Drift) -->
+  <main id="standby-container" class="duo-layout">
+    
+    <!-- LADO ESQUERDO: Relógio Minimalista + Data -->
+    <section class="duo-pane clock-pane" aria-label="Relógio Digital">
+      <div class="digital-clock">
+        <span id="clock-hours">00</span><span id="clock-colon" class="colon-blink">:</span><span id="clock-minutes">00</span>
+      </div>
+      <div id="clock-date" class="date-display">DOM, 18 OUT</div>
+    </section>
+
+    <!-- LADO DIREITO: Widget de Bateria AMOLED -->
+    <section class="duo-pane battery-pane" aria-label="Status da Bateria">
+      <div class="battery-widget">
+        <div class="battery-ring-wrapper">
+          <svg class="battery-ring" viewBox="0 0 120 120">
+            <!-- Trilha de fundo ultra escura para não forçar os subpixels -->
+            <circle class="ring-track" cx="60" cy="60" r="52"></circle>
+            <!-- Barra de progresso preenchida via JS (circunferência = 326.72) -->
+            <circle id="battery-progress" class="ring-fill" cx="60" cy="60" r="52"></circle>
+          </svg>
+          <div class="battery-center">
+            <span id="battery-badge">--%</span>
+          </div>
         </div>
+        <div id="charging-state-label" class="battery-subtext">Verificando...</div>
+      </div>
+    </section>
 
-    </main>
-    <script href="app.js"></script>
+  </main>
+
+  <script src="./app.js"></script>
 </body>
 </html>
