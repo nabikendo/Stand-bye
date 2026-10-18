@@ -1,71 +1,224 @@
+/* =========================================================
+   VARIÁVEIS DE TEMA E PROTEÇÃO AMOLED (#000000 ABSOLUTO)
+   ========================================================= */
 :root {
   --bg-amoled: #000000;
-  --clock-color: #ffffff;
+  --fg-primary: #ffffff;
+  --fg-secondary: #737373;
   --accent-color: #38bdf8;
-  --idle-alpha: 0.85;
+  --ring-track: #141414;
+  --container-alpha: 0.88;
 }
 
-/* Modo Noturno (inspirado no customNightModeTintConfig do APK) */
+/* Filtro de Modo Noturno Vermelho (customNightModeTintConfig) */
 body.night-mode {
-  --clock-color: #ff1a1a;
-  --accent-color: #990000;
-  --idle-alpha: 0.55; /* Reduz o brilho para proteger a visão e o AMOLED */
+  --fg-primary: #ff1a1a;
+  --fg-secondary: #660505;
+  --accent-color: #cc0000;
+  --ring-track: #1a0202;
+  --container-alpha: 0.55; /* Reduz emissão luminosa no escuro */
 }
 
+/* =========================================================
+   RESET E BASE FULLSCREEN
+   ========================================================= */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
   user-select: none;
   -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
-body {
-  background-color: var(--bg-amoled);
-  color: var(--clock-color);
-  font-family: system-ui, -apple-system, sans-serif;
+html, body {
   width: 100vw;
   height: 100vh;
+  background-color: var(--bg-amoled);
+  color: var(--fg-primary);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.4s ease;
+  transition: color 0.35s ease;
 }
 
-/* Container que recebe o Pixel Shift / Drift */
-#standby-container {
-  opacity: var(--idle-alpha);
-  transition: transform 1.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
-  text-align: center;
+/* =========================================================
+   LAYOUT AMOLED_CLOCK_DUO (DIVISÃO 50 / 50 HORIZONTAL)
+   ========================================================= */
+#standby-container.duo-layout {
+  width: 92vw;
+  height: 86vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  justify-items: center;
+  opacity: var(--container-alpha);
+  /* Transição suave para que o Pixel Shift (Drift) seja imperceptível */
+  transition: transform 1.8s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+  will-change: transform;
+}
+
+.duo-pane {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =========================================================
+   PAINEL ESQUERDO: RELÓGIO DIGITAL MINIMALISTA
+   ========================================================= */
+.digital-clock {
+  font-size: clamp(4.5rem, 15vw, 9.5rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Separador piscante (AMOLED_CLOCK_TOGGLE_BLINKING_SEPARATOR) */
 .colon-blink {
-  animation: blink 2s step-start infinite;
+  margin: 0 0.04em;
+  transform: translateY(-0.06em);
+  animation: pulse-colon 2s step-start infinite;
 }
 
-@keyframes blink {
-  50% { opacity: 0.15; }
+@keyframes pulse-colon {
+  50% { opacity: 0.12; }
 }
 
-/* Alerta discreto quando em modo Retrato (isAutoCloseOnPortraitEnabled) */
+.date-display {
+  margin-top: 0.8rem;
+  font-size: clamp(0.95rem, 2.2vw, 1.35rem);
+  font-weight: 500;
+  color: var(--fg-secondary);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  transition: color 0.35s ease;
+}
+
+/* =========================================================
+   PAINEL DIREITO: WIDGET DE BATERIA
+   ========================================================= */
+.battery-widget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.battery-ring-wrapper {
+  position: relative;
+  width: clamp(140px, 24vw, 220px);
+  height: clamp(140px, 24vw, 220px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.battery-ring {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ring-track {
+  fill: none;
+  stroke: var(--ring-track);
+  stroke-width: 8;
+  transition: stroke 0.35s ease;
+}
+
+.ring-fill {
+  fill: none;
+  stroke: var(--accent-color);
+  stroke-width: 8;
+  stroke-linecap: round;
+  /* Circunferência para r=52: 2 * PI * 52 ≈ 326.72 */
+  stroke-dasharray: 326.72;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.8s ease, stroke 0.35s ease;
+}
+
+.battery-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#battery-badge {
+  font-size: clamp(1.6rem, 4.2vw, 2.6rem);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.battery-subtext {
+  margin-top: 0.8rem;
+  font-size: clamp(0.8rem, 1.8vw, 1.1rem);
+  color: var(--fg-secondary);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: color 0.35s ease;
+}
+
+/* =========================================================
+   OVERLAY DE ORIENTAÇÃO RETRATO (#portrait-warning)
+   ========================================================= */
 #portrait-warning {
   position: fixed;
   inset: 0;
-  background: #000000;
-  color: #555555;
+  background-color: #000000;
+  color: var(--fg-secondary);
   display: none;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  z-index: 999;
+  text-align: center;
+  z-index: 9999;
+  padding: 2rem;
 }
 
-@media (orientation: portrait) {
-  #portrait-warning.active {
-    display: flex;
-  }
+#portrait-warning.active {
+  display: flex;
+}
+
+.warning-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.rotate-icon {
+  margin-bottom: 0.5rem;
+  animation: tilt-phone 2.5s ease-in-out infinite;
+}
+
+@keyframes tilt-phone {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-90deg); }
+}
+
+.warning-box p {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-primary);
+  opacity: 0.7;
+}
+
+.warning-box span {
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
