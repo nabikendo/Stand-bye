@@ -4,7 +4,7 @@
 const StandByeConfig = {
   isNightModeOn: true,                 // Ativa o filtro vermelho escuro
   amoledDriftEnabled: true,            // Ativa o Pixel shift macro
-  driftRangePx: 4,                     // Raio máximo de movimento do relógio (-4px a +4px)
+  driftRangePx: 4,                     // Raio máximo de movimento (-4px a +4px)
   blinkingSeparator: true,             // Piscar os dois-pontos ":"
   isAutoPauseOnPortraitEnabled: true,  // Pausa ao colocar o S24 FE em pé
   isAutoCloseOnUnplugCharger: false    
@@ -13,18 +13,18 @@ const StandByeConfig = {
 const StandByeState = {
   isCharging: false,
   batteryPercentage: 100,
-  isPortrait: false
+  isPortrait: false,
+  wakeLockSentinel: null
 };
 
-// 1. Relógio em tempo real
+// 1. Relógio em tempo real com suporte a segundos/minutos
 function updateClock() {
   const now = new Date();
   const hours = String(now.getHours()).padStart(2, '0');
   const minutes = String(now.getMinutes()).padStart(2, '0');
   
-  // Atualiza data simples
-  const dateOptions = { weekday: 'long', day: 'numeric', month: 'short' };
-  const dateStr = now.toLocaleDateString('pt-BR', dateOptions);
+  const dateOptions = { weekday: 'short', day: 'numeric', month: 'short' };
+  const dateStr = now.toLocaleDateString('pt-BR', dateOptions).replace(/\./g, '').toUpperCase();
   
   const clockEl = document.getElementById('digital-clock');
   const dateEl = document.getElementById('current-date');
@@ -39,7 +39,7 @@ function applyNightMode() {
   document.body.classList.toggle('night-mode', StandByeConfig.isNightModeOn);
 }
 
-// 3. Monitor de Bateria (Equivalente ao BatteryChrgTracker do APK)
+// 3. Monitor de Bateria
 async function initBatteryTracker() {
   if ('getBattery' in navigator) {
     try {
@@ -65,10 +65,10 @@ async function initBatteryTracker() {
   }
 }
 
-// 4. Detector de Orientação (isAutoPauseOnPortraitEnabled)
+// 4. Detector de Orientação (Portrait Guard)
 function initOrientationGuard() {
   const checkOrientation = () => {
-    const isPortrait = window.matchMedia('(orientation: portrait)').matches;
+    const isPortrait = window.innerHeight > window.innerWidth;
     StandByeState.isPortrait = isPortrait;
     const warningEl = document.getElementById('portrait-warning');
     if (warningEl && StandByeConfig.isAutoPauseOnPortraitEnabled) {
@@ -77,10 +77,32 @@ function initOrientationGuard() {
   };
 
   window.addEventListener('resize', checkOrientation);
+  window.addEventListener('orientationchange', checkOrientation);
   checkOrientation();
 }
 
-// 5. PROTEÇÃO ANTI-BURN-IN: PIXEL SHIFT MACRO + CHECKERBOARD MICRO INVERT
+// 5. Screen Wake Lock API (Impede o S24 FE de apagar a tela)
+async function requestWakeLock() {
+  if ('wakeLock' in navigator) {
+    try {
+      StandByeState.wakeLockSentinel = await navigator.wakeLock.request('screen');
+      StandByeState.wakeLockSentinel.addEventListener('release', () => {
+        console.log('[Stand-bye] Wake Lock liberado.');
+      });
+      console.log('[Stand-bye] Wake Lock ativo com sucesso.');
+    } catch (err) {
+      console.warn('[Stand-bye] Erro ao ativar Wake Lock:', err.message);
+    }
+  }
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    requestWakeLock();
+  }
+});
+
+// 6. PROTEÇÃO ANTI-BURN-IN: PIXEL SHIFT MACRO + CHECKERBOARD MICRO INVERT
 let checkerboardPhase = false;
 
 function applyPixelShift() {
@@ -91,14 +113,12 @@ function applyPixelShift() {
   
   if (!container) return;
 
-  // 5.1 Deslocamento macro do bloco de conteúdo (Drift)
   const range = StandByeConfig.driftRangePx;
   const randomX = Math.floor(Math.random() * (range * 2 + 1)) - range;
   const randomY = Math.floor(Math.random() * (range * 2 + 1)) - range;
 
   container.style.transform = `translate3d(${randomX}px, ${randomY}px, 0)`;
 
-  // 5.2 Deslocamento micro da máscara Checkerboard (Inverte os subpixels em 1px)
   if (overlay) {
     checkerboardPhase = !checkerboardPhase;
     const shiftX = checkerboardPhase ? '1px' : '0px';
@@ -106,10 +126,9 @@ function applyPixelShift() {
     overlay.style.backgroundPosition = `${shiftX} ${shiftY}`;
   }
 }
-// Dispara o Pixel Shift e inversão do xadrez a cada 60 segundos
 setInterval(applyPixelShift, 60000);
 
-// 6. Toque Duplo para alternar Modo Noturno Vermelho / Branco
+// 7. Toque Duplo para alternar Modo Noturno Vermelho / Branco
 let lastTapTime = 0;
 document.addEventListener('touchend', (e) => {
   const currentTime = new Date().getTime();
@@ -122,11 +141,22 @@ document.addEventListener('touchend', (e) => {
   lastTapTime = currentTime;
 });
 
+// Força Fullscreen e Wake Lock no primeiro toque
+document.addEventListener('click', async () => {
+  try {
+    if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+      await document.documentElement.requestFullscreen();
+    }
+  } catch (e) {}
+  requestWakeLock();
+}, { once: true });
+
 // Inicialização Geral
 window.addEventListener('DOMContentLoaded', () => {
   updateClock();
   applyNightMode();
   initBatteryTracker();
   initOrientationGuard();
-  applyPixelShift(); // Executa o primeiro shift imediatamente
+  applyPixelShift();
+  requestWakeLock();
 });
