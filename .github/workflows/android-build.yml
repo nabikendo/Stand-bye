@@ -1,4 +1,4 @@
-name: Build Android APK (Capacitor)
+name: Build Android APK
 
 on:
   push:
@@ -8,47 +8,42 @@ on:
 
 jobs:
   build:
-    # Fixado em ambiente estável para evitar conflitos de compilação do ecossistema Android
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout Source Code
       uses: actions/checkout@v4
 
-    - name: Setup Node.js (Version 24)
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 24
+        node-version: '20'
 
-    - name: Setup Java JDK (Version 17)
-      uses: actions/setup-java@v5
+    - name: Setup Java JDK
+      uses: actions/setup-java@v4
       with:
-        distribution: 'zulu'
+        distribution: 'temurin'
         java-version: '17'
 
-    - name: Create Package Manifest
+    - name: Install Dependencies
       run: |
-        echo '{"name": "standbye", "version": "1.0.0", "dependencies": {}}' > package.json
+        npm init -y
+        npm install @capacitor/core @capacitor/cli @capacitor/android
 
-    - name: Install Capacitor Packages
+    - name: Configure Capacitor App
       run: |
-        npm install @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest
+        npx cap init StandBye com.nabikendo.standbye --web-dir=. --confirm
+        npx cap add android
 
-    - name: Initialize Capacitor Config
-      run: npx cap init StandBye com.nabikendo.standbye --web-dir=. --confirm
-
-    - name: Add Android Platform
-      run: npx cap add android
-
-    - name: Sync Web Code into Android
+    - name: Sync Web Assets
       run: npx cap sync android
 
-    - name: Build Android App (APK)
+    - name: Build Debug APK
       run: |
         cd android
         ./gradlew assembleDebug
 
-    - name: Upload APK to GitHub Artifacts
+    - name: Upload Finished APK
       uses: actions/upload-artifact@v4
       with:
         name: StandBye-Debug-APK
