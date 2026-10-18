@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    # Travado no Ubuntu 24.04 para garantir estabilidade máxima com as ferramentas Android
+    # Fixado em ambiente estável para evitar conflitos de compilação do ecossistema Android
     runs-on: ubuntu-24.04
 
     steps:
