@@ -21,7 +21,8 @@ body, html {
     justify-content: center;
     align-items: center;
     padding: 3rem;
-    transition: transform 0.3s ease, filter 0.3s ease;
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), filter 0.3s ease;
+    will-change: transform;
 }
 
 /* Divisão exata 50/50 do AMOLED_CLOCK_DUO */
@@ -31,6 +32,8 @@ body, html {
     width: 100%;
     max-width: 1100px;
     gap: 48px;
+    align-items: center;
+    justify-items: center;
 }
 
 .widget {
@@ -48,6 +51,7 @@ body, html {
     font-weight: 700;
     letter-spacing: -3px;
     line-height: 1;
+    font-variant-numeric: tabular-nums;
 }
 
 #current-date {
@@ -61,6 +65,7 @@ body, html {
 #battery-badge {
     font-size: 3rem;
     font-weight: 600;
+    font-variant-numeric: tabular-nums;
 }
 
 /* 🔴 FILTRO DO MODO NOTURNO VERMELHO */
@@ -94,6 +99,7 @@ body.night-mode #current-date {
     font-size: 1.5rem;
     color: #ffffff;
     font-weight: 500;
+    text-align: center;
 }
 
 /* =========================================================
@@ -101,12 +107,11 @@ body.night-mode #current-date {
    ========================================================= */
 #checkerboard-overlay {
     position: fixed;
-    inset: -10px; /* Margem extra para evitar vazar bordas no shift */
+    inset: -10px;
     z-index: 999;
-    pointer-events: none; /* Permite clicar/tocar através da máscara */
-    opacity: 0.95; /* Mantém a legibilidade perfeita do relógio */
+    pointer-events: none;
+    opacity: 0.95;
     
-    /* Grade de xadrez de 2px por 2px (1px preto, 1px transparente) */
     background-image: 
       repeating-linear-gradient(0deg, #000000, #000000 1px, transparent 1px, transparent 2px),
       repeating-linear-gradient(90deg, #000000, #000000 1px, transparent 1px, transparent 2px);
